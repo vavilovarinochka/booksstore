@@ -1,0 +1,105 @@
+#logo {
+    width: 140px;
+    /* margin-top:auto */
+}
+
+#basket {
+    width: 100px;
+}
+
+#profil {
+    width: 50px;
+}
+
+a {
+    color: #000000;
+    text-decoration: none
+}
+
+a:hover {
+    color: black;
+    background-color: rgb(194, 194, 194);
+    border-color: rgb(194, 194, 194)
+}
+
+a:active {
+    background-color: rgb(71, 71, 71);
+    border-color: rgb(194, 194, 194)
+}
+
+a:focus {
+    background-color: rgb(141, 141, 141);
+    border-color: rgb(194, 194, 194)
+}
+
+
+.bg-light {
+    --bs-bg-opacity: 1;
+    background-color: rgba(15, 13, 13, 0.205) !important;
+}
+
+/* .navbar-nav {
+    margin-right: 10rem;
+} */
+
+.navbar {
+    font-family: Century Gothic, sans-serif;
+    letter-spacing: 3.5px
+}
+
+.nav-link {
+    color: rgba(0, 0, 0, .55) !important;
+}
+
+.nav-link.disabled {
+    color: rgba(0, 0, 0, .55) !important;
+    font-weight: bold;
+}
+
+
+
+/* .form {
+    margin-right: 10rem;
+} */
+
+.navbar-nav {
+    color: rgb(0, 0, 0) !important;
+}
+
+.navbar-nav.disabled {
+    color: rgb(0, 0, 0) !important;
+}
+
+.navbar-expand-sm .navbar-collapse {
+    margin-top: auto
+}
+
+.d-flex {
+    margin-left: auto;
+    /* margin-right: 10rem; */
+}
+
+.btn-outline-success {
+    color: #000000;
+    border-color: #000000;
+}
+
+.btn-outline-success :hover {
+    background-color: rgb(194, 194, 194);
+    border-color: rgb(194, 194, 194)
+}
+
+.btn-outline-success :active {
+    background-color: rgb(194, 194, 194);
+    border-color: rgb(194, 194, 194)
+}
+
+.btn-outline-success :focus {
+    background-color: rgb(194, 194, 194);
+    border-color: rgb(194, 194, 194)
+}
+
+.container {
+    font-size: 28px;
+
+}

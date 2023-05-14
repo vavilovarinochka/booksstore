@@ -1,0 +1,60 @@
+body {
+    height: 100vh
+}
+
+
+#root{
+    min-height: 100%;
+    display: flex;
+    flex-direction: column;
+}
+
+.main {
+    flex: 1 1 auto;
+}
+
+.logo {
+    width: 105px;
+    margin-top: auto;
+}
+
+.card {
+    width: 70%;
+    margin-left: auto;
+    margin-right: auto;
+    margin-top: 30px;
+    margin-bottom: 50px;
+}
+
+.btn-primary {
+    font-size: 18px;
+    color: #000000;
+    background-color: #ffffff;
+    border-color: #000000;
+    border-width: 2px;
+    transition: background 2s;
+}
+
+.btn-primary:hover {
+    color: #000000;
+    background-color: rgb(255, 255, 255) !important;
+    border-color: #000000;
+    border-width: 2px;
+}
+
+.btn-primary:active {
+    color: #000000;
+    background-color: #ffffff;
+    border-color: #000000;
+    border-width: 2px;
+}
+
+@keyframes fadein {
+    from { opacity: 0; }
+    to { opacity: 1; }
+}
+
+@keyframes fadeout {
+    from { opacity: 1; }
+    to { opacity: 0; }
+}
