@@ -7,31 +7,35 @@
   "author": "",
   "main": "index.js",
   "scripts": {
-    "knex": "knex",
-    "migrate": "knex migrate:up --knexfile src/database/knexfile.js ",
-    "migrate:undo": "knex migrate:down --knexfile src/database/knexfile.js ",
+    "knex": "knex --knexfile src/database/knexfile.js",
+    "migrate": "knex migrate:up --knexfile src/database/knexfile.js",
+    "migrate:undo": "knex migrate:down --knexfile src/database/knexfile.js",
     "seed": "knex seed:run",
-    "serve": "nodemon src/server.js",
+    "serve": "nodemon --watch src src/server.js",
     "start": "node src/server.js",
-    "test": "jest"
+    "test": "jest",
+    "lint": "eslint src --ext js,jsx --report-unused-disable-directives --max-warnings 0"
   },
   "dependencies": {
     "add": "^2.0.6",
     "async-middleware": "^1.2.1",
     "bcryptjs": "^2.4.3",
     "cors": "^2.8.5",
-    "dotenv": "^16.0.0",
+    "dotenv": "^16.0.3",
     "express": "^4.17.3",
     "express-validator": "^6.14.0",
     "jest": "^28.1.0",
     "jsonwebtoken": "^8.5.1",
-    "knex": "^1.0.3",
+    "knex": "^1.0.7",
     "knex-migrate": "^1.7.4",
     "multer": "^1.4.5-lts.1",
     "nodemailer": "^6.7.8",
-    "pg": "^8.7.3"
+    "pg": "^8.11.0"
   },
   "devDependencies": {
+    "eslint": "^8.41.0",
+    "eslint-config-prettier": "^8.8.0",
+    "eslint-plugin-prettier": "^4.2.1",
     "nodemon": "^2.0.16"
   }
 }

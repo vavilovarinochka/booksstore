@@ -19,13 +19,15 @@ const ProductCard = ({ product, isAdmin, getProductList, handleAdd, deleteProduc
     useEffect(() => {
         getPhoto()
     }, [])
+
     return (
         <Card style={{ width: '18rem' }}>
             {photoUrl &&
                 <Card.Img
-                    className="d-block m-auto"
-                    style={{ width: '90%' }}
-                    src={photoUrl} />
+                    variant="top"
+                    className="d-block p-2"
+                    src={photoUrl}
+                    style={{ aspectRatio: 1 }} />
             }
             <Card.Body>
                 <Card.Title>{product.title}</Card.Title>
@@ -71,16 +73,13 @@ const ProductCard = ({ product, isAdmin, getProductList, handleAdd, deleteProduc
                 }
             </Card.Body>
         </Card>
-
-
-
     )
 }
 
 const Buy = () => {
     const [isAdmin, setIsAdmin] = useState(false);
     const [addModalShow, setAddModalShow] = useState(false);
-    const [productList, setProductList] = useState(false)
+    const [productList, setProductList] = useState(null)
     const { cartList, setCartList } = useContext(cartContext);
 
     const getUserData = async () => {
@@ -88,10 +87,17 @@ const Buy = () => {
         if (user.role === "admin") return setIsAdmin(true)
     }
 
-    async function getProductList() {
-        const { success, products, message } = await getData('/products/list')
-        if (!success) return alert(message);
-        return setProductList(products)
+    const getProductList = async () => {
+        try {
+            const { success, products, message } = await getData('/products/list')
+            if (!success) {
+                return alert(message)
+            };
+
+            return setProductList(products)
+        } catch (error) {
+            console.error(error)
+        }
     }
 
     function handleAdd(itemId) {
@@ -117,6 +123,7 @@ const Buy = () => {
         getProductList()
         getUserData()
     }, [])
+
     return (
         <Container>
             <h1

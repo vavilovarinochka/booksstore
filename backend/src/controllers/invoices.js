@@ -1,32 +1,35 @@
+const checkout = require("../utils/checkout");
 const ControllerException = require("../utils/ControllerException");
 const knex = require("../utils/db");
-const { groupByKey } = require("../utils/normalizeData");
 
-// add a new order
-exports.createOrder = async ({ user_id, products, price }) => {
+// creates new invoice if not exists
+exports.createInvoice = async ({ user_id, order }) => {
     try {
-        const [{ id: orderId }] = await knex("orders")
-            .insert([{ user_id, price }])
-            .returning("id");
+        const [record] = await knex("invoices").where({ order_id: order.id }).select("*");
+        if (!record) {
+            await knex("invoices")
+                .insert([{ order_id: order.id, user_id, status: "pending" }])
+                .returning("*");
+        }
 
-        JSON.parse(products).forEach(async ({ id: product_id, amount }) => {
-            await knex("orders_products")
-                .insert([{ order_id: orderId, product_id, amount }])
-        });
-        return { orderId };
-    }
-    catch (error) {
-        console.log(error)
+        const { status, confirmation, paid } = await checkout(order);
+        if (paid) {
+            await knex("invoices").update({ status: status }).where({ order_id: order.id });
+            return;
+        }
+
+        return { status, confirmation, paid };
+    } catch (error) {
+        console.log(error);
         throw new ControllerException("ERROR", "something went wrong and this is bad");
     }
 };
 
+// TODO: rewrite this functions
 // update an order
 exports.updateOrder = async ({ users_id, price }) => {
     try {
-        const [record] = await knex("orders")
-            .update({ users_id, price })
-            .where({ id: orderId });
+        const [record] = await knex("orders").update({ users_id, price }).where({ id: orderId });
 
         return record;
     } catch (error) {
@@ -55,21 +58,21 @@ exports.getOrders = async ({ limit, offset }) => {
     //     .offset(offset);
 
     const records = await knex("orders")
-        .innerJoin('orders_products', { 'orders_products.order_id': 'orders.id' })
-        .innerJoin('products', { 'products.id': 'orders_products.product_id' })
+        .innerJoin("orders_products", { "orders_products.order_id": "orders.id" })
+        .innerJoin("products", { "products.id": "orders_products.product_id" })
         .innerJoin("users", { "users.id": "user_id" })
         .select(
             "orders.id",
             "orders.price as total_price",
-            'products.title as product_name',
+            "products.title as product_name",
             "products.price",
-            'orders_products.amount as amount',
+            "orders_products.amount as amount",
             "name as client_name"
         )
         .limit(limit)
         .offset(offset);
 
-    const test = Object.values(groupByKey(records, 'id'))
+    const test = Object.values(groupByKey(records, "id"));
 
     // const records = await knex('users')
     //     .leftJoin('user_addresses', 'users.id', '=', 'user_addresses.user_id')
@@ -87,44 +90,23 @@ exports.getOrders = async ({ limit, offset }) => {
 
 // get list orders
 exports.getUserRelatedOrders = async ({ userId, limit, offset }) => {
-    let records = await knex("orders")
-        .innerJoin('orders_products', { 'orders_products.order_id': 'orders.id' })
-        .innerJoin('products', { 'products.id': 'orders_products.product_id' })
-        .innerJoin("users", { "users.id": "orders.user_id" })
-        .innerJoin("invoices", { "invoices.order_id": "orders.id" })
+    const records = await knex("orders")
+        .innerJoin("orders_products", { "orders_products.order_id": "orders.id" })
+        .innerJoin("products", { "products.id": "orders_products.product_id" })
+        .innerJoin("users", { "users.id": "user_id" })
         .select(
             "orders.id",
             "orders.price as total_price",
-            'products.title as product_name',
-            "status",
+            "products.title as product_name",
             "products.price",
-            'orders_products.amount as amount',
+            "orders_products.amount as amount",
             "name as client_name"
         )
         .where("users.id", userId)
         .limit(limit)
         .offset(offset);
 
-        if (records.length === 0) {
-            records = await knex("orders")
-            .innerJoin('orders_products', { 'orders_products.order_id': 'orders.id' })
-            .innerJoin('products', { 'products.id': 'orders_products.product_id' })
-            .innerJoin("users", { "users.id": "orders.user_id" })
-            .select(
-                "orders.id",
-                "orders.price as total_price",
-                'products.title as product_name',
-                "products.price",
-                'orders_products.amount as amount',
-                "name as client_name"
-            )
-            .where("users.id", userId)
-            .limit(limit)
-            .offset(offset);
-        }
-
-
-    const test = Object.values(groupByKey(records, 'id'))
+    const test = Object.values(groupByKey(records, "id"));
 
     // const records = await knex('users')
     //     .leftJoin('user_addresses', 'users.id', '=', 'user_addresses.user_id')

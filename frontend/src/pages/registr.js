@@ -17,20 +17,27 @@ const Registr = () => {
     const [password, setPassword] = useState("");
 
     const onRegistr = async (e) => {
-        e.preventDefault()
-        const response = await postData("/users/signup", { name, email, password });
+        try {
+            e.preventDefault()
+            const response = await postData("/users/signup", { name, email, password });
+            if (!response.success) {
+                alert(response.message);
+                if (response.code !== "NETWORK_ERROR") {
+                    setPassword("");
+                }
 
-        if (!response.success) {
-            alert(response.message);
-            if (response.code !== "NETWORK_ERROR") setPassword("");
-            return;
+                return;
+            }
+
+            alert("Успешная регистрация")
+
+            localStorage.setItem("token", response.token);
+            navigate("/");
+        } catch (error) {
+            console.log(error)
         }
-
-        alert(response.message)
-
-        localStorage.setItem("token", response.token);
-        navigate("/");
     };
+
     return (
         <Container>
             <Row>

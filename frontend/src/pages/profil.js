@@ -7,7 +7,6 @@ import Form from "react-bootstrap/Form";
 import Table from "react-bootstrap/Table";
 import { getData, postData } from "../utils/network";
 
-
 const OrdersTable = () => {
     const [orders, setOrders] = useState(null);
 
@@ -28,13 +27,25 @@ const OrdersTable = () => {
         "Статус оплаты",
     ];
 
+    const checkout = async (order) => {
+        try {
+            const { confirmation, paid } = await postData("/invoices/create", order)
+            if (!paid) {
+                window.open(confirmation.confirmation_url, "_self")
+            }
+
+        } catch (error) {
+            console.error(error)
+        }
+    }
+
     useEffect(() => {
         getOrdersList()
     }, [])
 
     return (
         <Container>
-            {orders && orders.length > 0 ?
+            {!orders || orders.length === 0 ? <h1 className="d-flex justify-content-center">Заказов пока нет</h1> :
                 <Table
                     responsive="sm"
                     bordered
@@ -42,51 +53,53 @@ const OrdersTable = () => {
                     title="Мои заказы"
                     style={{ backgroundColor: "white", borderRadius: 5 }}
                 >
-
-                    <>
-                        <thead>
-                            <tr align="center">
-                                <th colSpan={12}>Мои заказы</th>
-                            </tr>
-                            <tr>
-                                {recordsTableHead.map((item, index) => (
-                                    <th key={index}>{item}</th>
-                                ))}
-                            </tr>
-                        </thead>
-                        <tbody>
-                            {orders.map((order, index) => (
-                                <tr key={order.id}>
-                                    <td align="center">{index + 1}</td>
-                                    <td>
-                                        {Array.isArray(order.product_name) ? order.product_name.map((product_name, index) =>
+                    <thead>
+                        <tr align="center">
+                            <th colSpan={12}>Мои заказы</th>
+                        </tr>
+                        <tr>
+                            {recordsTableHead.map((item, index) => (
+                                <th key={index}>{item}</th>
+                            ))}
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {orders.map((order, index) => (
+                            <tr key={order.id}>
+                                <td align="center">{index + 1}</td>
+                                <td>
+                                    {!Array.isArray(order.product_name) ? order.product_name
+                                        : order.product_name.map((product_name, index) =>
                                             <p key={index}>
                                                 {product_name}
                                             </p>
-                                        ) : order.product_name}
-                                    </td>
-                                    <td>
-                                        {Array.isArray(order.amount) ? order.amount.map((amount, index) =>
-                                            <p key={index}>
-                                                {amount}
-                                            </p>
-                                        ) : order.amount}
-                                    </td>
-                                    <td>
-                                        {new Intl.NumberFormat("ru-RU", { style: "currency", currency: "RUB" }).format(order.total_price)}
-                                    </td>
-                                    <td align="center">
+                                        )}
+                                </td>
+                                <td>
+                                    {!Array.isArray(order.amount) ? order.amount : order.amount.map((amount, index) =>
+                                        <p key={index}>
+                                            {amount}
+                                        </p>
+                                    )}
+                                </td>
+                                <td>
+                                    {new Intl.NumberFormat("ru-RU", { style: "currency", currency: "RUB", maximumFractionDigits: 0 }).format(order.total_price)}
+                                </td>
+                                <td align="center">
+                                    {order.status === "succeeded" ? "Оплачен" :
+                                     <>
                                         Не оплачен
                                         <br />
-                                        <Button>
+                                        <Button onClick={() => checkout(order)}>
                                             Оплатить
                                         </Button>
-                                    </td>
-                                </tr>
-                            ))}
-                        </tbody>
-                    </>
-                </Table> : <h1 className="d-flex justify-content-center">Заказов пока нет</h1>}
+                                    </>
+                                    }
+                                </td>
+                            </tr>
+                        ))}
+                    </tbody>
+                </Table>}
         </Container>
     )
 }
@@ -94,8 +107,8 @@ const OrdersTable = () => {
 const UserForm = ({ currentName, currentEmail }) => {
     const [newName, setNewName] = useState(currentName);
     const [newEmail, setNewEmail] = useState(currentEmail);
-    const [currentPassword, setCurrentPassword] = useState(null);
-    const [newPassword, setNewPassword] = useState(null);
+    const [currentPassword, setCurrentPassword] = useState('');
+    const [newPassword, setNewPassword] = useState('');
 
     const editUserData = (e) => {
         e.preventDefault();
@@ -119,8 +132,8 @@ const UserForm = ({ currentName, currentEmail }) => {
             >
                 <Card className="w-100">
                     <Card.Body>
-                        <Card.Title style={{ fontFamily: "Century Gothic", letterSpacing: "3.5px", textAlign: "center", fontSize: "30px" }}>
-                            ИЗМЕНИТЬ ВАШИ ДАННЫЕ
+                        <Card.Title className="text-center text-uppercase" style={{ fontFamily: "Century Gothic", letterSpacing: "3.5px", fontSize: "30px" }}>
+                            Изменить ваши данные
                         </Card.Title>
 
                         <Form onSubmit={editUserData}>
@@ -171,8 +184,9 @@ const UserForm = ({ currentName, currentEmail }) => {
 
                             <Button
                                 className="d-block mt-3"
-                                style={{ width: "300px", margin: "0 auto", borderColor: "black", color: "black" }}
                                 type='submit'
+                                disabled={currentPassword === '' || newPassword === ''}
+                                style={{ width: "300px", margin: "0 auto", borderColor: "black", color: "black" }}
                             >
                                 Изменить
                             </Button>
@@ -209,7 +223,7 @@ const Profil = () => {
 
             <OrdersTable />
 
-            {user ? <UserForm currentName={user.name} currentEmail={user.email} /> : null}
+            {!user ? null : <UserForm currentName={user.name} currentEmail={user.email} />}
         </Container>
     );
 }

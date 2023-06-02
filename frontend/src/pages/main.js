@@ -41,7 +41,8 @@ const Main = () => {
                     Купить книги
                 </Button>
             </Card >
-        </>);
+        </>
+    );
 };
 
 export default Main

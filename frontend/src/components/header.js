@@ -28,7 +28,7 @@ const Header = () => {
                 <Navbar.Brand as={Link} to="/">
                     <img
                         id="logo"
-                        src={"assets/logo.png"}
+                        src={"/assets/logo.png"}
                         alt='logo'
                     />
                 </Navbar.Brand>
